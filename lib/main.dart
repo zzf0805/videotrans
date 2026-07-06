@@ -431,13 +431,28 @@ class _Header extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '在线视频标准化工具',
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w900,
-                    color: _text,
-                  ),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      '在线视频标准化工具',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.w900,
+                        color: _text,
+                      ),
+                    ),
+                    Text(
+                      '导入的视频请确保是1280x720分辨率',
+                      style: TextStyle(
+                        color: _danger,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 5),
                 Text(
@@ -678,26 +693,28 @@ class _JobList extends StatelessWidget {
     if (jobs.isEmpty) {
       return _GlassPanel(
         child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.video_library_outlined,
-                color: _muted.withValues(alpha: 0.7),
-                size: 54,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                '还没有视频',
-                style: TextStyle(
-                  color: _text,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w800,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.video_library_outlined,
+                  color: _muted.withValues(alpha: 0.7),
+                  size: 54,
                 ),
-              ),
-              const SizedBox(height: 6),
-              Text('拖入文件，或点击“添加文件”开始。', style: TextStyle(color: _muted)),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  '还没有视频',
+                  style: TextStyle(
+                    color: _text,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text('拖入文件，或点击“添加文件”开始。', style: TextStyle(color: _muted)),
+              ],
+            ),
           ),
         ),
       );
