@@ -27,11 +27,13 @@ jobs:
       - name: Bundle Visual C++ runtime
         shell: pwsh
         run: |
-          $redist = Join-Path $env:VCToolsRedistDir "x64\Microsoft.VC143.CRT"
-          if (-not (Test-Path $redist)) {
-            throw "Visual C++ runtime directory not found: $redist"
+          $redist = Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\2022\*\VC\Redist\MSVC\*\x64\Microsoft.VC143.CRT" -Directory |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1
+          if (-not $redist) {
+            throw "Visual C++ runtime directory not found"
           }
-          Copy-Item "$redist\*.dll" "build/windows/x64/runner/Release" -Force
+          Copy-Item "$($redist.FullName)\*.dll" "build/windows/x64/runner/Release" -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
