@@ -24,6 +24,15 @@ jobs:
       - name: Build Windows release
         run: flutter build windows --release
 
+      - name: Bundle Visual C++ runtime
+        shell: pwsh
+        run: |
+          $redist = Join-Path $env:VCToolsRedistDir "x64\Microsoft.VC143.CRT"
+          if (-not (Test-Path $redist)) {
+            throw "Visual C++ runtime directory not found: $redist"
+          }
+          Copy-Item "$redist\*.dll" "build/windows/x64/runner/Release" -Force
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
