@@ -27,13 +27,37 @@ jobs:
       - name: Bundle Visual C++ runtime
         shell: pwsh
         run: |
-          $redist = Get-ChildItem "${env:ProgramFiles}\Microsoft Visual Studio\2022\*\VC\Redist\MSVC\*\x64\Microsoft.VC143.CRT" -Directory |
-            Sort-Object FullName -Descending |
-            Select-Object -First 1
+          $redist = $null
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          if (Test-Path $vswhere) {
+            $installations = & $vswhere -products * -requires Microsoft.VisualStudio.Component.VC.Redist.14.Latest -property installationPath
+            foreach ($installation in $installations) {
+              $redistRoot = Join-Path $installation "VC\Redist\MSVC"
+              if (Test-Path $redistRoot) {
+                $redist = Get-ChildItem $redistRoot -Directory |
+                  Sort-Object Name -Descending |
+                  ForEach-Object { Join-Path $_.FullName "x64\Microsoft.VC143.CRT" } |
+                  Where-Object { Test-Path $_ } |
+                  Select-Object -First 1
+                if ($redist) { break }
+              }
+            }
+          }
+          if (-not $redist) {
+            $searchRoots = @(
+              "${env:ProgramFiles}\Microsoft Visual Studio",
+              "${env:ProgramFiles(x86)}\Microsoft Visual Studio"
+            ) | Where-Object { Test-Path $_ }
+            $redist = $searchRoots |
+              ForEach-Object { Get-ChildItem $_ -Recurse -Directory -Filter "Microsoft.VC143.CRT" -ErrorAction SilentlyContinue } |
+              Where-Object { $_.FullName -like "*\x64\Microsoft.VC143.CRT" } |
+              Sort-Object FullName -Descending |
+              Select-Object -ExpandProperty FullName -First 1
+          }
           if (-not $redist) {
             throw "Visual C++ runtime directory not found"
           }
-          Copy-Item "$($redist.FullName)\*.dll" "build/windows/x64/runner/Release" -Force
+          Copy-Item "$redist\*.dll" "build/windows/x64/runner/Release" -Force
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
