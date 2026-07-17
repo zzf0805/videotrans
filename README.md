@@ -20,9 +20,6 @@
 - 内置 ffmpeg/ffprobe，不依赖本机 Python、Homebrew、PATH 或系统 ffmpeg。
 
 ## 检查和转换规则
-
-转换逻辑对齐 `/Users/zzf/Documents/check_faststart.py`。
-
 检查项：
 
 - `moov` atom 是否在 `mdat` 前面，即 faststart。
